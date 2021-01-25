@@ -1,0 +1,9 @@
+node_modules
+build
+public
+dist
+
+
+yarn.lock
+package-lock.json
+_unused
