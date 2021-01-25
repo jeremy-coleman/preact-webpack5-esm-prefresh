@@ -2,8 +2,6 @@ require('dotenv').config();
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const PreactRefreshPlugin = require('@prefresh/webpack');
-
 
 const BABEL_CONFIG = {
   presets: [
@@ -11,7 +9,6 @@ const BABEL_CONFIG = {
     ['@babel/preset-modules', { loose: true }]
   ],
   plugins: [
-    [process.env.NODE_ENV !== 'production' && "@prefresh/babel-plugin"],
     '@babel/plugin-syntax-dynamic-import',
     ['babel-plugin-transform-jsx-to-htm', {
       'import': {
@@ -23,43 +20,31 @@ const BABEL_CONFIG = {
 }
 
 const makeConfig = () => {
-  const { NODE_ENV } = process.env;
-  const isProduction = NODE_ENV === 'production';
   const apiUrl = process.env.API_URL
   
-    // Build plugins
-  const plugins = [
-    //https://webpack.js.org/plugins/source-map-dev-tool-plugin/
-    
-    new HtmlWebpackPlugin({ inject: true, template: './src/app/index.html' }),
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(NODE_ENV),
-      'process.env.API_URL': JSON.stringify(apiUrl),
-    }),
-  ];
-  if (!isProduction) {
-    plugins.push(new webpack.SourceMapDevToolPlugin({})),
-    plugins.push(new PreactRefreshPlugin());
-    plugins.push(new webpack.HotModuleReplacementPlugin());
-  } 
-
   // Return configuration
   return {
-    mode: isProduction ? 'production' : 'development',
+    mode: 'production',
     stats: 'normal',
     devtool: false,
     experiments:{
       outputModule: true
     },
-    entry: isProduction ? "./src/app/index.tsx" : ['./src/app/index.tsx',"./tools/webpack-hot-middleware/client"],
+    entry: "./src/app/index.tsx",
     output: {
       module: true,
       chunkFilename: `[name]-[contenthash].js`,
-      filename: isProduction ? `[name]-[contenthash].js` : `[name].js`,
+      filename: `[name]-[contenthash].js`,
       path: path.resolve(__dirname, 'dist'),
       publicPath: '/',
     },
-    plugins: plugins,
+    plugins: [
+      new HtmlWebpackPlugin({ inject: true, template: './src/app/index.html' }),
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify("production"),
+        'process.env.API_URL': JSON.stringify(apiUrl),
+      }),
+    ],
     resolve: {
       mainFields: ['module', 'browser','main'],
       extensions: [".tsx", ".ts", ".mjs", ".js", ".jsx"],

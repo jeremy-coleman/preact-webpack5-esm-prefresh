@@ -1,6 +1,6 @@
 const assert = require("assert")
 const webpack = require("webpack")
-const config = require("./webpack.config.js")
+const config = require("./webpack.production.js")
 const {logSymbols} = require("./tools/cli-helpers.js")
 
 var rimraf = require("rimraf")
@@ -25,10 +25,11 @@ function start() {
     if (!err && !stats.hasErrors() && !started) {
       started = true
       console.info(logSymbols.success, 'bundled');
-      if (err) {
+
+    }
+    if (err) {
         console.warn(err)
       }
-    }
   })
   return watcher
 }
